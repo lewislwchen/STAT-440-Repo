@@ -1,0 +1,44 @@
+---
+title: "STAT 440: Data and Sources"
+author: "Christopher Kinson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+
+- Shipping Arrivals at Cape of Good Hope provided by IMF Portwatch and Oxford University <https://uofi.box.com/shared/static/sctl0dsd72wubxfrn7ko0v6namn9fhl4.csv>
+
+- Shipping Arrivals at Strait of Hormuz provided by IMF Portwatch and Oxford University <https://uofi.box.com/shared/static/bbupg81yyw6ynzktv1bcebgggxq2cizd.csv>
+
+- Shipping Arrivals at Strait of Hormuz provided by IMF Portwatch and Oxford University <https://uofi.box.com/shared/static/765ueln3kmknv8498wv6a9e6qh9vheui.xlsx>
+
+- Data Science Jobs Postings provided by Glassdoor via web-scraping by Kaggle user Rashik Rahman <https://uofi.box.com/shared/static/5nqg2dk8uym5u87s9rv1gq10mtxnybij.txt>
+
+- Greatest of All Time Artists and their Songs provided by Billboard and Spotify <https://uofi.box.com/shared/static/omj8z0gb2zivcuhn5fhqt0n8ahvxwes4.json>
+
+- Highest Grossing Films provided by Box Office Mojo, an IMDB company <https://uofi.box.com/shared/static/drhbcntw0g73u29m79t9yl8q4oocgir7.xlsx>
+
+- Food Inspections in year 2021 provided by City of Chicago <https://uofi.box.com/shared/static/2lh0lmn0itb3uchduvzkj1f43ju4he0j.csv>
+
+- The Complete Works of William Shakespeare provided by Project Gutenberg <https://uofi.box.com/shared/static/19qhj5fmlvo1a3mwf22gx31j5h9oh9o8.txt>
+
+- Trump Tweets 2017-2019 provided by Trump Twitter Archive and Twitter <https://uofi.box.com/shared/static/sf65zjc2s9xhpy6npnw21edai61evhnl.txt>
+
+- Audio file provided by Loopmasters <https://uofi.box.com/shared/static/vmmaky1fe5wgv9z4vnzrsln1why3jg8u.wav>
+
+## APIs
+
+- National Oceanic and Atmospheric Administration / National Weather Service (NOAA/NWS) API <https://openweathermap.org/api>
+
+- OpenWeatherMap API <https://openweathermap.org/api>
+
+- The Open Movie Database (OMDb) API <http://www.omdbapi.com>
+
+## Web pages
+
+- Champaign County Assessor Property Tax Inquiry for Parcel Number 922116304005 provided by Chanpaign County <https://champaignil.devnetwedge.com/parcel/view/922116304005/2025>

@@ -1,0 +1,473 @@
+---
+title: "STAT 440: Week 4"
+author: Christopher Kinson
+format: revealjs
+editor: visual
+---
+
+## Extracting Data: Review {.scrollable}
+
+|                                               |                          |
+|:----------------------------------------------|:-------------------------|
+| *Structured data*                             |                          |
+| `read_csv()`                                  | if delimiter is comma    |
+| `read_delim()`                                | if alternative delimiter |
+| `read_fwf()`                                  | if fixed-width           |
+| *Semi-structured data*                        |                          |
+| `jsonlite::fromJSON()`                        | if JSON object           |
+| `openxlsx::read.xlsx()`                       | if Excel spreadsheet     |
+| `rvest::read_html() |>` `rvest::html_table()` | if HTML table            |
+| *Unstructured data*                           |                          |
+| `readLines()`                                 | if text file             |
+
+## Transforming Data: Arranging or Sorting {.scrollable}
+
+- Arranging or sorting involves viewing a row-ordered dataset based on specified column(s)
+
+- The row-ordering could be descending (decreasing) or ascending (increasing)
+
+- In the **tidyverse** package, we can use the `arrange()` function in combination with `|>`
+
+  - The `desc()` changes the order that works well with the `arrange()`
+
+`data_name |>` `arrange(desc(column_name01), column_name02)`
+
+- In *base R*:
+  - sort values with the `sort()` function\
+  - sort indices or positions with the `order()` function\
+  - reverse the input with the `rev()` function
+
+`sort(data_name$column_name01, decreasing = TRUE)`
+
+`data_name[order(data_name$column_name01, decreasing = TRUE), ]`
+
+`rev(data_name$column_name01)`
+
+## Transforming Data: Organizing {.scrollable}
+
+- We may desire for columns to appear in a certain layout or position
+
+- In the **tidyverse** package, we may select columns with the `select()` function and its helper functions
+
+  - `everything()`: all remaining columns\
+  - `starts_with()`: column name(s) having character string prefix\
+  - `ends_with()`: column name(s) having character string suffix\
+  - `contains()`: column name(s) having character string\
+  - `where()`: columns for which a function returns TRUE\
+  - `last_col()`: column in the final position (rightmost)
+  - and others!
+
+`data_name |>` `select(column_name01, column_name03, column_name02)`
+
+- Certain *base R* operators and functions are useful within `select()`:
+  - `!` for the complement of a set of columns
+  - `&` for the intersection of a set of columns
+  - `|` for the union of a set of columns
+  - `c()` for combining or concatenating columns
+- In the **tidyverse** package, reposition multiple columns at once using the `relocate()` function
+
+`data_name |>` `relocate(column_name01, .after = column_name04, .before = last_col())`
+
+- In *base R*, `[]`, and `c()` could help with organizing data
+
+`data_name_new <- data_name[, c("column_name01", "column_name03", "column_name02")]`
+
+## Transforming Data: Filtering and Slicing {.scrollable}
+
+- In the **tidyverse** package, limit row output based on conditions using `filter()` and its relative function `filter_out()`
+
+- The *base R* `%in%` operator can be helpful with the `filter()` function
+
+`data_name |>` `filter(column_name01 == condition01, column_name02 != condition02)`
+
+`data_name |>` `filter(column_name01 %in% conditions | column_name02 != condition02)`
+
+`data_name |>` `filter_out(column_name01 == condition01)`
+
+- In the **tidyverse** package, limit row output based on row index or position using `slice()` and its relative functions:
+  - `slice_sample(n = )`: random selection of n rows without replacement by default
+  - `slice_min(order_by = , n = )`: smallest n values of order_by column\
+  - `slice_max(order_by = , n = )`: largest n values of order_by column\
+  - `slice_head(n = )`: first n rows\
+  - `slice_tail(n = )`: last n rows
+
+`data_name |>` `slice(row_indices)`
+
+## Transforming Data: Dropping Missing Values {.scrollable}
+
+- A missing value could be unknown or NULL or an actual value that just never made it into the data frame
+
+- Humans have historically recorded unknown values as "unknown", "9999", or "99999" in a data set
+
+- Missing values are often represented in R as `NA` (not available), `NaN` (not a number), ".", or " " (an empty character string) in data
+
+- Null values are coded as `NULL` in R and often used to create empty R objects
+
+  - In SQL, missing values are coded as `NULL`
+
+- In the **tidyverse** package, `drop_na()` can remove rows due to missingness for specified columns or for the entire data set
+
+`data_name |>` `drop_na(column_name01)`
+
+- In *base R*, we can detect missing values in the rows with `is.na()` and remove them with `[]` via filtering
+
+`data_name[is.na(data_name$column_name), ]`
+
+## Transforming Data: Detecting and Removing Duplicate Values {.scrollable}
+
+- If a data set contains two or more rows with the exact same values across all columns, then that data set is said to have duplicate rows
+
+- A row is unique if at least one of its columns is different from all other rows
+
+- Duplicate values can be detected when we count the unique combination of rows filtering the resulting count greater than 1 (with the `count()` in the **tidyverse** package)
+
+`data_name |>` `count(across(everything())) |>` `filter(n > 1)`
+
+- In *base R*, the `anyDuplicated()` function returns a index indicating which row(s) is/are duplicates of previously appearing rows. To find the two (or more) rows as proof of duplication, one could change its argument `anyDuplicated(fromLast = TRUE)` and combine with `c()` and `[]` via filtering
+
+`data_name[c(anyDuplicated(data_name), anyDuplicated(data_name, fromLast = TRUE)), ]`
+
+- In the **tidyverse** package, we can remove duplicate values with the `distinct()` function
+
+`data_name |>` `distinct(column_name01, .keep_all = TRUE)`
+
+- In *base R*, we can remove duplicate values with the `unique()` function in combination with the `[]` via filtering
+
+`data_name[unique(data_name$column_name01), ]`
+
+## Monday In-class Assignment {.scrollable}
+
+1.  Extract the [Data Science Jobs Postings provided by Glassdoor via web-scraping by Kaggle user Rashik Rahman](https://uofi.box.com/shared/static/5nqg2dk8uym5u87s9rv1gq10mtxnybij.txt).
+
+2.  Print the structure of the data frame. Answer these conceptual questions:
+
+    - Are there any logical mode columns?\
+    - How might we separate the information within the Location and Headquarters columns?\
+    - What might we do to parse the Job Description column consistently?
+
+3.  Slice the data frame to show only the first 3 rows.
+
+4.  Filter the data frame to show only the rows where the Job Title equals "data scientist". You may want to ensure the case is the consistent with the `toupper()` or `tolower()` function.
+
+5.  If there are any duplicates in the data, print them.
+
+6.  Drop missing values from the Salary Estimate column, sort the resulting set in decreasing order of the Rating column, and print the structure of the resulting data frame.
+
+7.  Organize the columns such that the numeric mode columns appear first, followed by the character mode columns, and finally the logical mode columns. Slice and print a random set of 5 rows of the resulting data frame. The random selection should be without replacement and determined by R not the user.
+
+8.  Is your work reproducible? If not, edit your solutions such that they are reproducible.
+
+9.  Submit your solutions as a .R script file in Canvas for the Week 4 In-class Assignment. Answers to the conceptual questions should be written as R comments with the `#` prefix. The file name should be week04_mon.R.
+
+## Typical Objects and Modes in R {.scrollable}
+
+|  |  |
+|:---|:---|
+| *Objects* |  |
+| **atomic vector** | `:`, `seq()`, `rep()`, `c()`, `vector()`, `as.vector()` |
+| **matrix** | `matrix()`, `rbind()`, `cbind()`, `as.matrix()` |
+| **factor** | `factor()`, `as.factor()` |
+| **list** | `list()`, `as.list()` |
+| **data frame** | `data.frame()`, `rbind()`, `cbind()`, `as.data.frame()` |
+| tidyverse package's **tibble** | `tibble()`, `as_tibble()` |
+| *Modes* |  |
+| **integer** | `as.integer()` |
+| **numeric** | `as.numeric()` |
+| **double** | `as.double()` |
+| **logical** | `as.logical()` |
+| **character** | `as.character()` |
+
+## Transforming Data: Wrangling Dates and Times {.scrollable}
+
+- When a data set contains date and time information in the columns, we want to ensure the correct format is applied for proper interpretation by our computer
+
+- R stores the date information numerically in reference to January 1, 1970; 1970-01-01 equals 0 as a numeric value
+
+- Dates and times are numeric mode values with different classes in R, such as Date, POSIX, period, etc.
+
+| Date Format Code | Meaning                                              |
+|:-----------------|:-----------------------------------------------------|
+| %a               | Abbreviated weekday name                             |
+| %A               | Full weekday name                                    |
+| %b               | Abbreviated month name                               |
+| %B               | Full month name                                      |
+| %c               | Date and time                                        |
+| %d               | Day of the month (0-31)                              |
+| %H               | Hours (24 hour)                                      |
+| %I               | Hours (12 hour)                                      |
+| %j               | Day of the year numbered (000-366)                   |
+| %m               | Month numbered (01-12)                               |
+| %M               | Minute numbered (00-59)                              |
+| %p               | AM/PM                                                |
+| %S               | Second numbered (00-61)                              |
+| %U               | Week of the year starting on Sunday numbered (00-53) |
+| %w               | Weekday starting on Sunday numbered (0-6)            |
+| %W               | Week of the year starting on Monday numbered (00-53) |
+| %y               | 2-digit year                                         |
+| %Y               | 4-digit year                                         |
+| %z               | Offset from UTC                                      |
+| %Z               | Time zone (character)                                |
+
+- In the **tidyverse** package, the `mdy()` and its relative functions cast dates:
+
+  - `mdy()` if the original date value appears as a two-digit month, two-digit day, and four-digit year\
+  - `ymd()` if the original date appears as four-digit year, two-digit month, two-digit day\
+  - `hm()` if the original time appears as hour-minute time value\
+  - `hms()` if the original time appears as hour-minute-second time value\
+  - `mdy_hms()` if the original datetime appears as four-digit year, two-digit month, two-digit day, hour-minute-second time value\
+  - and others!
+
+`mdy(data_name$date_column_name01)`
+
+- In *base R*:
+
+  - `as.Date(format = )` casts dates for specified date format codes based on original appearance\
+  - `as.POSIXct(format = )` casts a datetime and time value for specified date and time format codes based on original appearance\
+  - `format()` changes the current format to another; result is in character mode
+
+`as.Date(data_name$date_column_name01, format = "%m/%d/%Y")`
+
+`format(as.Date(data_name$date_column_name01, format = "%m/%d/%Y"), "%Y")`
+
+## Transforming Data: Mutating {.scrollable}
+
+- Mutating is the act of creating a new data point to an existing data set
+
+- Mutating can happen in the row dimension and/or the column dimension
+
+- In the **tidyverse** package, we mutate columns with the `mutate()` function or its relative `transmute()`
+
+  - `mutate()` function appends new columns to the right of existing columns in data frame\
+  - `transmute()` creates new columns and removes existing columns in data frame
+
+- Many vectorized functions and operators can be used within the `mutate()` function to create new columns
+
+  - arithmetic operators: `+`, `-`, `*`, `/`, `%%`, `^`\
+  - logical operators: `>`, `<`, `>=`, `<=`, `==`, and `!=`\
+  - mathematics functions: `exp()`, `log()`, `sqrt()`, `abs()`, and `round()`\
+  - string manipulation functions: `paste()`, `substr()`, `strsplit()`, `toupper()`, and `tolower()`\
+  - conditional functions: `if_else()`, and `case_when()`
+
+`data_name |>` `mutate(new_column_name01 = function_name01(column_name01),` `column_name02 = function_name02(column_name02))`
+
+`data_name |>` `mutate(new_column_name01 = if_else(column_name01 == original_value01, new_value01_if_true, new_value02_if_false)` `)`
+
+`data_name |>` `mutate(new_column01 = case_when(` `column_name01 == original_value01 ~ new_value01,` `column_name01 == original_value02 ~ new_value02,` `column_name01 == original_value03 ~ new_value03,` `.default = NA)` `)`
+
+- In the **tidyverse** package, we mutate rows with new values for each column via the `add_row()` function
+  - the new row is added to the bottom of the data frame
+  - `.before =` or `.after =` arguments specify exactly where the new row should be added
+
+`data_name |>` `add_row(column_name01 = new_value01, column_name02 = new_value02, .before = row_index01, .after = row_index02)`
+
+- The above mutated columns and rows are on-the-fly mutations and not stored into any object in our current environment; use `<-` to store the mutated data frame into a new object
+
+- In *base R*, we can mutate by assigning a new column with `$` or row in the proper index with `[]`
+
+`data_name$new_column_name01 <- function_name01(data_name$column_name01)`
+
+`data_name[nrow(data_name) + 1, ] <- data.frame(new_value01, new_value02)`\]
+
+## Transforming Data: Reshaping {.scrollable}
+
+- Reshaping can include transposing and pivoting
+
+- Transposing via `t()` in R is a simple 90-degree shift of rows into columns, or vice versa
+
+- Pivoting is a tailored transposition with care being given about the column names and their associated values
+
+- In the **tidyverse** package, `pivot_longer()` is useful when we want to make a data set longer (resulting in more rows because original data has multiple columns with similar or repeating subject)
+
+- In the **tidyverse** package, `pivot_wider()` is useful when we want to make a data set wider (resulting in more columns because original data has multiple rows with similar or repeating subject)
+
+`data_name |>` `pivot_longer(cols = c(column_name01, column_name02), names_to = "new_column_name01", values_to = "new_column_name02")`
+
+`data_name |>` `pivot_wider(names_from = column_name01, values_from = column_name02)`
+
+## Wednesday In-class Assignment {.scrollable}
+
+1.  Extract the [Zillow Observed Rent Index provided by Zillow](https://uofi.box.com/shared/static/kjulhvqj976fzfxfjx57ljcelguu9fag.csv).
+
+2.  Print the structure of the data frame. Answer these conceptual questions:
+
+    - Are there any compound columns? What kind of singular columns would be best to separate the compound columns into?\
+    - How do you feel about the way the data is currently organized?
+
+3.  Filter out any row for which the 'RegionName' column is not a city and state value.
+
+4.  Reshape the data such that the resulting set contains more rows than columns. The column names containing a date should be pivoted into a single column named 'Date', and the values of those columns should be pivoted into a single column named 'Rent'. Store the resulting set as the object name `zillow_data`. Be sure to format the 'Date' column as a proper date column in R. Print the structure.
+
+5.  If there are any duplicates in the `zillow_data`, print them.
+
+6.  Beginning with `zillow_data`, filter to keep rows for which the 'StateName' refers to the state of Illinois (abbreviated as IL). Now with that resulting set, remove the 'StateName' column and 'RegionType' column and store the current resulting set as the object name `zillow_data_illinois`. Print the structure.
+
+7.  Beginning with `zillow_data_illinois`, mutate a new row to have the values: 'RegionID' = 440, 'SizeRank' = nrow(zillow_data_illinois)+1, 'RegionName' = 'Urbana, IL', 'Date' = Sys.Date(), and 'Rent' = YOURRENT, where YOURRENT is the average monthly rent for everyone at your table in class. Store the resulting set as the object name `zillow_data_urbana_illinois`. Print the structure.
+
+8.  Is your work reproducible? If not, edit your solutions such that they are reproducible.
+
+9.  Create an new function in R that reverses the values of a character string input (assuming the input is length 1). Name your function `rev_char`. For example, if the input is 'apples', then the output is 'selppa'. **Devise your `rev_char()` function on base R functions alone, such as `strsplit()`, `rev()`, and `paste()`.**
+
+10. Submit your solutions as a week04_wed.R script file in Canvas for the Week 4 In-class Assignment. Answers to the conceptual questions should be written as R comments with the `#` prefix.
+
+## Review: Monday In-class Assignment {.scrollable visibility="hidden"}
+
+1.  Extract the [Data Science Jobs Postings provided by Glassdoor via web-scraping by Kaggle user Rashik Rahman](https://uofi.box.com/shared/static/5nqg2dk8uym5u87s9rv1gq10mtxnybij.txt).
+
+2.  Print the structure of the data frame. Answer these conceptual questions:
+
+    - Are there any logical mode columns?\
+    - How might we separate the information within the Location and Headquarters columns?\
+    - What might we do to parse the Job Description column consistently?
+
+3.  Slice the data frame to show only the first 3 rows.
+
+4.  Filter the data frame to show only the rows where the Job Title equals "data scientist". You may want to ensure the case is the consistent with the `toupper()` or `tolower()` function.
+
+5.  If there are any duplicates in the data, print them.
+
+6.  Drop missing values from the Salary Estimate column, sort the resulting set in decreasing order of the Rating column, and print the structure of the resulting data frame.
+
+7.  Organize the columns such that the numeric mode columns appear first, followed by the character mode columns, and finally the logical mode columns. Slice and print a random set of 5 rows of the resulting data frame. The random selection should be without replacement and determined by R not the user.
+
+8.  Is your work reproducible? If not, edit your solutions such that they are reproducible.
+
+9.  Submit your solutions as a .R script file in Canvas for the Week 4 In-class Assignment. Answers to the conceptual questions should be written as R comments with the `#` prefix. The file name should be week04_mon.R.
+
+## Review: Wednesday In-class Assignment {.scrollable visibility="hidden"}
+
+1.  Extract the [Zillow Observed Rent Index provided by Zillow](https://uofi.box.com/shared/static/kjulhvqj976fzfxfjx57ljcelguu9fag.csv).
+
+2.  Print the structure of the data frame. Answer these conceptual questions:
+
+    - Are there any compound columns? What kind of singular columns would be best to separate the compound columns into?\
+    - How do you feel about the way the data is currently organized?
+
+3.  Filter out any row for which the 'RegionName' column is not a city and state value.
+
+4.  Reshape the data such that the resulting set contains more rows than columns. The column names containing a date should be pivoted into a single column named 'Date', and the values of those columns should be pivoted into a single column named 'Rent'. Store the resulting set as the object name `zillow_data`. Be sure to format the 'Date' column as a proper date column in R. Print the structure via `str()` of `zillow_data`.
+
+5.  If there are any duplicates in the `zillow_data`, print them.
+
+6.  Beginning with `zillow_data`, filter to keep rows for which the 'StateName' refers to the state of Illinois (abbreviated as IL). Now with that resulting set, remove the 'StateName' column and 'RegionType' column and store the current resulting set as the object name `zillow_data_illinois`. Print the structure.
+
+7.  Beginning with `zillow_data_illinois`, mutate a new row to have the values: 'RegionID' = 440, 'SizeRank' = nrow(zillow_data_illinois)+1, 'RegionName' = 'Urbana, IL', 'Date' = Sys.Date(), and 'Rent' = YOURRENT, where YOURRENT is the average monthly rent for everyone at your table in class. Store the resulting set as the object name `zillow_data_urbana_illinois`. Print a slice of the last 10 rows of the resulting set.
+
+8.  Is your work reproducible? If not, edit your solutions such that they are reproducible.
+
+9.  Create an new function in R that reverses the values of a character string input (assuming the input is length 1). Name your function `rev_char`. For example, if the input is 'apples', then the output is 'selppa'. **Devise your `rev_char()` function on base R functions alone, such as `strsplit()`, `rev()`, and `paste()`.**
+
+## Transforming Data: Group Processing {.scrollable visibility="hidden"}
+
+- Grouped data can be any data that can be interpreted as having groups
+  - often a categorical variable or factor column
+- In the **tidyverse package**:
+  - `group_by()` function allows us to do data processing separately for each specified combination of groups in a data frame\
+- `rowwise()` function allows us to do group processing separately for each row in a data frame; useful when a vectorized function does not exist\
+- does not explicitly change the data frame, but it does add metadata to the data frame - often used before a `mutate()` or `summarise()`\
+- when using `rowwise()`, we can also incorporate the `c_across()` function to select multiple columns for a single row
+
+`data_name |>` `group_by(column_name01, column_name02) |>` `mutate(new_column_name01 = function_name01(column_name03))`
+
+`data_name |>` `rowwise() |>` `mutate(new_column_name01 = function_name01(c_across(column_name01, column_name02))`
+
+## Transforming Data: Summarizing or Aggregating {.scrollable visibility="hidden"}
+
+- Applying summary functions, such as the length `length()`, the sum `sum()`, mean `mean()`, median `median()`, variance `var()`, or standard deviation `sd()`, on grouped data
+
+- Sometimes the way the data are arranged (or sorted) matters; other times not at all
+
+- In the **tidyverse package**, we can use the `group_by()` function in combination with the `summarise()` function to return summarized or aggregated data as a tibble
+
+  - `summarise()` is the same exact function as `summarize()`
+  - `summarise()` results in different dimensional object than `mutate()`
+
+`data_name |>` `group_by(column_name01) |>` `summarize(new_column_name01 = function_name01(column_name02),` `new_column_name02 = function_name02(column_name03))`
+
+- If we want to count the number of rows in each group, we can use the `n()` function within `summarize()` or utilize the `count()` function without the `group_by()`
+
+`data_name |>` `group_by(column_name01) |>` `summarize(count_column_name = n())`
+
+`data_name |>` `count(column_name01)`
+
+- At times, you may want to use a selection helper during the summarizing or mutating process for applying a function to each selected column, then you could use the `across()` function
+
+`data_name |>` `mutate(across(selection_helper_function(arguments), function_name01))`
+
+- Other times, you may want to use a selection helper during the summarizing or mutating process for applying a function to the full data frame, then you could use the `pick()` function
+
+`data_name |>` `mutate(new_column_name01 = function_name01(pick(selection_helper_function(arguments))))`
+
+- In *base R*, we can use the `aggregate()` function to return summarized or aggregated data as a data frame
+
+`aggregate(data_name, list(Group = column_name01), FUN = function_name01)`
+
+## Transforming Data: Vectorized Functions {.scrollable visibility="hidden"}
+
+- Vectorized functions are functions that can be applied to a vector of values (of length N) and return a vector of results (also of length N)
+
+- Some vectorized functions are built-in to R, while others are available in the **tidyverse** package
+
+  - arithmetic operators: `+`, `-`, `*`, `/`, `%%`, `^`\
+  - logical operators: `>`, `<`, `>=`, `<=`, `==`, and `!=`\
+  - mathematics functions: `exp()`, `log()`, `sqrt()`, `abs()`, and `round()`\
+  - string manipulation functions: `paste()`, `substr()`, `strsplit()`, `toupper()`, and `tolower()`\
+  - **tidyverse** package's conditional functions: `if_else()`, and `case_when()`
+
+- If a function is not vectorized, we can vectorize it using the **tidyverse** package's `map()` function
+
+- If a function is not vectorized, we can vectorize it using the *base R*'s `lapply()` function
+
+## Visual Representations of Transforming Data {visibility="hidden"}
+
+Which function(s) transform(s) the data in image#1 to image#2?
+
+![](https://uofi.box.com/shared/static/mu24sjrbuiueitcd931g1iemedti21vr.png)
+
+## Visual Representations of Transforming Data {visibility="hidden"}
+
+Which function(s) transform(s) the data in image#1 to image#5?
+
+![](https://uofi.box.com/shared/static/c4tigztgc1yjptlehk91kk5dxxgriqyf.png)
+
+## Visual Representations of Transforming Data {visibility="hidden"}
+
+Which function(s) transform(s) the data in image#1 to image#7?
+
+![](https://uofi.box.com/shared/static/mre3shp03p02bsrj7ppdamnk6tukvmeg.png)
+
+## Visual Representations of Transforming Data {visibility="hidden"}
+
+Which function(s) transform(s) the data in image#1 to image#12?
+
+![](https://uofi.box.com/shared/static/ugyz5u2z1a4zlbh35qyyolwt67ust16f.png)
+
+## Visual Representations of Transforming Data {visibility="hidden"}
+
+Which function(s) transform(s) the data in image#1 to image#3 to image#9?
+
+![](https://uofi.box.com/shared/static/zwdzhj54i4o9xcr0jna15g88oc81w640.png)
+
+## Friday In-class Assignment {.scrollable visibility="hidden"}
+
+1.  Extract the [Zillow Observed Rent Index provided by Zillow](https://uofi.box.com/shared/static/kjulhvqj976fzfxfjx57ljcelguu9fag.csv).
+
+2.  Print the structure of the data frame. Answer these conceptual questions:
+
+    - Are there any compound columns? What kind of singular columns would be best to separate the compound columns into?\
+    - How do you feel about the way the data is currently organized?
+
+3.  Filter out any row for which the 'RegionName' column is not a city and state value.
+
+4.  Reshape the data such that the resulting set contains more rows than columns. The column names containing a date should be pivoted into a single column named 'Date', and the values of those columns should be pivoted into a single column named 'Rent'. Store the resulting set as the object name `zillow_data`. Be sure to format the 'Date' column as a proper date column in R. Print the structure.
+
+5.  If there are any duplicates in the `zillow_data`, print them.
+
+6.  Beginning with `zillow_data`, filter to keep rows for which the 'StateName' refers to the state of Illinois (abbreviated as IL). Now with that resulting set, remove the 'StateName' column and 'RegionType' column and store the current resulting set as the object name `zillow_data_illinois`. Print the structure.
+
+7.  Beginning with `zillow_data_illinois`, mutate a new row to have the values: 'RegionID' = 440, 'SizeRank' = nrow(zillow_data_illinois)+1, 'RegionName' = 'Urbana, IL', 'Date' = Sys.Date(), and 'Rent' = YOURRENT, where YOURRENT is the average monthly rent for everyone at your table in class. Store the resulting set as the object name `zillow_data_urbana_illinois`. Print the structure.
+
+8.  Is your work reproducible? If not, edit your solutions such that they are reproducible.
+
+9.  Create an new function in R that reverses the values of a character string input (assuming the input is length 1). Name your function `rev_char`. For example, if the input is 'apples', then the output is 'selppa'. **Devise your `rev_char()` function on base R functions alone, such as `strsplit()`, `rev()`, and `paste()`.**
+
+10. Submit your solutions as a week04_wed.R script file in Canvas for the Week 4 In-class Assignment. Answers to the conceptual questions should be written as R comments with the `#` prefix.

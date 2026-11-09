@@ -1,0 +1,298 @@
+---
+title: "STAT 440: Week 3"
+author: Christopher Kinson
+format: revealjs
+editor: visual
+---
+
+## Relational Database {.scrollable}
+
+- ["A Relational Model of Data for Large Shared Data Banks" by E. F. Codd](https://dl.acm.org/doi/epdf/10.1145/362384.362685)
+
+  - Data should be represented as sets of tables
+
+  - Information can be linked or *related* across different tables
+
+- SQL ("see-kwull") is a nonprocedural programming language used to manage data in relational databases.
+
+  - Utilizes internal *optimizer* for efficient execution of queries
+  - Many relational database management systems (RDBMS) use SQL to manage data in relational databases
+    - e.g., MySQL, MariaDB, DuckDB, PostgreSQL, Microsoft SQL Server, and SQLite
+
+<small>Sourced from Chapter 1 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## Relational Database: Software {.scrollable}
+
+- **MySQL** is one RDBMS that uses SQL to manage data in relational databases
+
+- Not all SQL RDBMS have the exact same syntax or functionality, but they all use SQL to manage data in relational databases
+
+- **DBI** is an R package that provides a database interface for R
+
+- **RMariaDB** is an R package that works with MySQL
+
+## Urbana Rentals' Properties {.scrollable}
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+read_csv('https://uofi.box.com/shared/static/qx1w9safq7luwl4f6ahxbl6agmelr60r.csv') |>
+  kbl() |>
+  kable_styling() |>
+  column_spec(1:4, background = "#FF5F05")
+```
+
+## Urbana Rentals' Inspections {.scrollable}
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+read_csv('https://uofi.box.com/shared/static/h72vhzjcehkp9wzrizysio6og7iiljad.csv') |>
+  kbl() |>
+  kable_styling() |>
+  column_spec(1:6, background = "#FF5F05")
+```
+
+## Urbana Rentals' Landlords {.scrollable}
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+read_csv('https://uofi.box.com/shared/static/fvz6ftzfc7hrpt08q8e9ke8fz3lznf25.csv') |>
+  kbl() |>
+  kable_styling() |>
+  column_spec(1:6, background = "#FF5F05")
+```
+
+## Relational Database: Terminology {.scrollable}
+
+|  |  |
+|:-----------------------------------|:-----------------------------------|
+| **Data** | information |
+| **Database** | a set of related information, such as Contacts, Spotify, iCard, etc.; often written as DB, dB, or db |
+| **Query** | a question, task, or request written to find data |
+| **Entity** | data of specific interest, such as customers, parts, geographic locations, etc. |
+| **Column** | individual piece of data stored in a table |
+| **Row** | set of columns that together completely describe an entity; a record or observation |
+| **Table** | set of rows, held either in memory (nonpersistent) or on permanent storage (persistent) |
+| **Result Set** | the resulting SQL query; a nonpersistent table |
+| **Primary Key** | one or more columns that can be used as a unique identifier for each row in current table; ideally every table has a primary key |
+| **Foreign Key** | one or more columns that can be used together to identify a single row in another table; not a primary key in current table |
+
+<small>Sourced from Chapter 1 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## Urbana Rentals' Landlords {.scrollable}
+
+- Which is the primary key?
+- Which is the foreign key?
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+read_csv('https://uofi.box.com/shared/static/fvz6ftzfc7hrpt08q8e9ke8fz3lznf25.csv') |>
+  kbl() |>
+  kable_styling() |>
+  column_spec(1:6, background = "#FF5F05")
+```
+
+## Relational Database: More Terminology {.scrollable}
+
+- **Schema**: the structure of a database, including the tables, columns, and relationships between them
+  - saved as a .sql file
+- **Normalization**: the process of organizing data in a database to reduce redundancy and improve data integrity
+  - splitting up a compound column
+  - removing a duplicate column
+- **Constraint**: a rule that restricts the values that can be stored in a column or table, such as a primary key constraint or a foreign key constraint
+  - Goal is to specify columns that allow values that are minimally required and maximally expected
+
+<small>Sourced from Chapters 1-2 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## MySQL Data Types: Character Data {.scrollable}
+
+|                     |                                                   |
+|:--------------------|:--------------------------------------------------|
+| **CHAR(NUMBER)**    | length of characters is fixed to specified length |
+| **CHAR(20)**        | each value is padded be 20 characters             |
+| **VARCHAR(NUMBER)** | length of characters can vary                     |
+| **VARCHAR(20)**     | each value can be up to 20 characters long        |
+| **LONGTEXT**        | ideal for documents of characters                 |
+
+<small>Sourced from Chapter 2 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## MySQL Data Types: Numeric Data {.scrollable}
+
+|  |  |
+|:-----------------------------------|:-----------------------------------|
+| **BOOLEAN** | 0 (false) or 1 (true) values |
+| **TINYINT** | integers defaulting to include negative and positive numbers; spans from -128 to 127 |
+| **SMALLINT** | integers spanning from -32,768 to 32,767 |
+| **INT** | integers spanning from -2,147,483,648 to 2,147,483,647 |
+| **FLOAT** | decimal-valued numbers; spans from -3.402823466E+38 to 3.402823466E+38 |
+| **DOUBLE** | much larger range of values than FLOAT |
+| **UNSIGNED** | a designation for numeric data types that can only store non-negative values |
+
+<small>Sourced from Chapter 2 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## MySQL Data Types: Temporal Data {.scrollable}
+
+|  |  |
+|:-----------------------------------|:-----------------------------------|
+| **DATE** | defaults to YYYY-mm-dd format |
+| **DATETIME** | defaults to YYYY-mm-dd HH:MM:SS format |
+| **TIMESTAMP** | defaults to YYYY-mm-dd HH:MM:SS format; automatically populated with the current date/time by the MySQL server when a row is added to a table or when a row is later modified |
+| **YEAR** | defaults to YYYY format |
+| **TIME** | defaults to HH:MM:SS format |
+
+<small>Sourced from Chapter 2 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## Group Assignment: Design Your Own Database {.scrollable}
+
+Based on the people at your table, devise a plan for what the group's database will look like:
+
+- What is the entity?
+
+- How many tables will there be?
+
+- How are the tables related?
+
+- What are the columns for each table?
+
+- What are the values allowed in the columns of each table?
+
+- What are the constraints for each column?
+
+- What are the data types for each column?
+
+- What are the primary and foreign keys for each table?
+
+## MySQL and the Command Line: Extracting with SQL {.scrollable}
+
+THE SQL COMMANDS ARE IN UPPERCASE.
+
+|  |  |
+|:-----------------------------------|:-----------------------------------|
+| **DESCRIBE** | see structural information for a data table |
+| **SELECT** | choose existing columns and potentially mutate data with new columns |
+| **FROM** | the data table, which is the source of the columns to be selected |
+| **;** (semicolon) | required to signal the end of SQL command |
+
+Assuming the database and data tables have already been created, we can:
+
+- See structural information for a data table by executing the command:\
+  `DESCRIBE existing_data_table_name;`
+
+- Extract data by querying a data table by executing the command:\
+  `SELECT column_name01, column_name02 FROM existing_data_table_name;`
+
+## MySQL and R: Extracting with SQL and R {.scrollable}
+
+R's **DBI** package functions in camelCase.
+
+|  |  |
+|:-----------------------------------|:-----------------------------------|
+| `dbConnect()` | connect to a database |
+| `dbListTables()` | list all data tables in a database |
+| `dbReadTable()` | extract an entire data table and convert directly to an R data frame |
+| `dbGetQuery()` | extract from a data table with SQL query |
+| `dbDisconnect()` | disconnect from a database; do this when finished working with a DBMS |
+
+Assuming the database and data tables have already been created, we can:
+
+1.  See all data tables and structural information for one existing data table in an existing database.\
+    `db_connection <- dbConnect(MariaDB(), user = "root", password = "your_mysql_password", host = "localhost", dbname = "database_name")`
+
+    `dbListTables(db_connection)`
+
+    `dbGetQuery(db_connection, "DESCRIBE existing_data_table_name")`
+
+    `dbDisconnect(db_connection)`
+
+2.  Extract existing data table and convert to data frame from existing database.\
+    `db_connection <- dbConnect(MariaDB(), user = "root", password = "your_mysql_password", host = "localhost", dbname = "database_name")`
+
+    `dbReadTable(db_connection, "existing_data_table_name")`
+
+    `dbDisconnect(db_connection)`
+
+3.  Extract existing data table with SQL query from existing database.\
+
+    `db_connection <- dbConnect(MariaDB(), user = "root", password = "your_mysql_password", host = "localhost", dbname = "database_name")`
+
+    `dbGetQuery(db_connection, "SELECT column_name01, column_name02 FROM existing_data_table_name")`
+
+    `dbDisconnect(db_connection)`
+
+## MySQL and R: Storing Your MySQL Password {.scrollable}
+
+- It's better to store your MySQL password in a .Renviron file in your home directory.
+
+- The .Renviron file is a hidden file that is read by R when it starts up.
+
+1.  Install the **usethis** package in R.
+
+2.  Execute the R code `usethis::edit_r_environ()`. This will open the .Renviron file in your default text editor. If the file does not exist, it will create one.
+
+3.  Go to the bottom of the file (that's open in your default text editor) and add the line `MYSQL_PASSWORD=your_mysql_password` on a new line. Then skip to a new line and save the file.
+
+4.  Now, instead of writing `password = "your_mysql_password"` within the `dbConnect()` function (above slide), you write `password = Sys.getenv(MYSQL_PASSWORD)`.
+
+## In-class Assignment {.scrollable}
+
+```{css, echo=FALSE}
+.reveal .scrollable ol {
+  padding-inline-start: 2em;
+}
+```
+
+0.  Update your [R](https://cran.r-project.org/) to the latest version **`r version$version.string`**! Run the following R code in your R console `version$version.string`. Take a screenshot of the result of that code in your console and upload it in Canvas for Week 3 In-Class Assignments. This is worth 1 bonus point to those who complete it and have the most up to date version of R running on their computer. The deadline to submit this for 1 bonus point is **Wednesday, September 9, 2026 at 5:00 pm**.
+
+1.  Install the **DBI** and **RMariaDB** packages in R.
+
+2.  Download and Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/).
+
+    - **During the installation process, take a picture of the temporary root password (last page of installation before completion).**
+    - Copy, paste, and save the temporary root password in a text editor on your computer.
+
+3.  Download and unzip the [sakila database (.zip)](https://dev.mysql.com/doc/index-other.html) on your computer.
+
+4.  If using macOS, open Terminal and start the MySQL Client by executing the following command:\
+    `mysql -u root -p`\
+    and then enter the **temporary root password** when prompted. The password may not be visible as you type it.
+
+    - If using Windows, open Command Prompt and start the MySQL Client by executing the following commands:\
+      `cd C:\Program Files\MySQL\MySQL Server 8.0\bin`\
+      `mysql -u root -p`\
+      and then enter the **temporary root password** when prompted. The password may not be visible as you type it.
+
+You may encounter an error message at step 4.
+
+- If your error message is "ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock'" then close and re-open the Terminal and execute the following command:\
+  `sudo /usr/local/mysql/support-files/mysql.server restart`
+  - Now redo step 4.
+- If your error message is "command not found: mysql" then follow these [instructions](https://share.google/aimode/UWTYCj4E6AeyVseKe) for your OS.
+
+5.  Now close and reopen the Terminal. Execute the following command:\
+    `mysql -u root -p`\
+    and then enter the **temporary root password** when prompted. Then MySQL Client should prompt you with the error message "ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement."
+
+6.  Reset your password by executing the following command: `ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';`\
+    where `new_password` is your newly created password. Make sure to save your new password in a text editor on your computer.
+
+7.  Now, you should receive a successful launch of the MySQL Client. You can now execute the following commands to load the 'sakila' database:\
+    `source /path/to/sakila-schema.sql;`\
+    `source /path/to/sakila-data.sql;`\
+    where "/path/to/" is the local path on your computer to the sakila database.
+
+8.  Create the `person` and `favorite_food` tables to go into the sakila database by following along in the [Table Creation section of Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/ch02.html#table_creation). To be honest, this is more of the Load (L) aspect of Extract, Transform, Load (ETL) paradigm.
+
+9.  Create data dictionaries for both the `person` and `favorite_food` tables as separate .Rmd files and upload in Canvas for Week 3 In-Class Assignments.
+
+10. Use R to connect to the MySQL system via DBI and RMariaDB with the `dbConnect()` function (same as above slide), create a new (empty) database named 'urbana_champaign_db' using `dbExecute(db_connection, paste0("CREATE DATABASE ", "new_database_name"))`, and disconnect from it with the `dbDisconnect()` function (same as above slide). To be honest, this is more of the Load (L) aspect of Extract, Transform, Load (ETL) paradigm.
+
+11. Now that the 'urbana_champaign_db' exists, use R to add the tables `urbana_rentals_properties`, `urbana_rentals_inspections`, and `urbana_rentals_landlords` (URLs in data-and-sources.Rmd in Canvas). This task is an R task, not MySQL. Now, using R and MySQL, verify their existence is successful and disconnect. To be honest, this is more of the Load (L) aspect of Extract, Transform, Load (ETL) paradigm.
+
+12. Submit your R code for steps 10 and 11 as a .Rmd file named 'week03-databases.Rmd' in Canvas for Week 3 In-Class Assignments. Use a .Renviron file to store your MySQL password. Do not include the .Renviron file in your submission. Do not leave your MySQL password in the week03-databases.Rmd file either.
+
+13. Using R and previous weeks' course content, extract the three JSON data files (Billboard GOAT Artists, Billboard GOAT Artists Top Ten Songs, Billboard GOAT Artists Top Ten Songs Albums) from the data-and-sources.Rmd file in Canvas. This has nothing to do with MySQL.
+
+14. Now, create a database named "billboard_goat_db", add the three billboard datasets (Billboard GOAT Artists, Billboard GOAT Artists Top Ten Songs, Billboard GOAT Artists Top Ten Songs Albums) into the MySQL database using R. Verify their existence is successful and disconnect. To be honest, this is more of the Load (L) aspect of Extract, Transform, Load (ETL) paradigm. Save your R code into an .R script file named "billboard_goat_db_code.R" and upload the .R file into Canvas.

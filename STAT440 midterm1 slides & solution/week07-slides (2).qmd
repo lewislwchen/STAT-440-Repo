@@ -1,0 +1,639 @@
+---
+title: "STAT 440: Week 7"
+author: Christopher Kinson
+format: revealjs
+editor: visual
+---
+
+## Skills-based Computer and Oral Exam #1 Takeaways {.scrollable}
+
+- Your solutions and code should be in .R script file; not .Rmd
+
+- Type out the questions/tasks as instructor says them aloud
+
+- Ask clarifying questions if unclear
+
+- Ask instructor to repeat a question
+
+- The best work is reproducible
+
+- Attach necessary packages, e.g., `library(tidyverse)`
+
+- Comment out any non-executable or error-producing code
+
+## Skills-based Computer and Oral Exam #1 Review: Task 1
+
+"Extract the data with the URL in the file. It is structured and comma delimited. Store the resulting set as prob01."
+
+## Skills-based Computer and Oral Exam #1 Review: Task 1
+
+"**Extract** the data with the **URL** in the file. It is **structured** and **comma delimited**. **Store** the resulting set as prob01."
+
+- Extract, URL, structured, comma-delimited... `read_csv('URL')`
+
+- Store... `<-`
+
+`prob01 <- read_csv('URL')`
+
+## Skills-based Computer and Oral Exam #1 Review: Task 2
+
+"Overwrite the Inspection Date and Expiration Date columns to be date mode in R. Store the resulting set as prob02."
+
+"Overwrite the Booking Date and Released Date columns to be date mode in R..."
+
+"Overwrite the End Time Listener Session Date column to be date mode in R..."
+
+## Skills-based Computer and Oral Exam #1 Review: Task 2 {.scrollable}
+
+"**Overwrite** the Inspection Date and Expiration Date/Booking Date and Released Date/End Time Listener Session Date **columns** to be **date mode** in R. Store the resulting set as prob02."
+
+- Overwrite, columns... `mutate(original_date_column_name01 = )`
+
+- Date mode... `mdy(original_date_column_name01)`, `ymd(original_date_column_name01)`, or `as.Date(original_date_column_name01, format =)`
+
+`prob02 <- prob01 |>` `mutate(original_date_column_name01 = ymd(original_date_column_name01),` `original_date_column_name02 = ymd(original_date_column_name02))`
+
+## Skills-based Computer and Oral Exam #1 Review: Task 3
+
+"Beginning with prob02, remove the License Status column. Store the resulting set as prob03."
+
+"Beginning with prob02, keep the following columns: booking_number, ..."
+
+"Beginning with prob02, select the following columns organizing them in this order of appearance: (1) end time listener session date, ..."
+
+## Skills-based Computer and Oral Exam #1 Review: Task 3 {.scrollable}
+
+"**Beginning with** prob02, **remove** the License Status **column**. Store the resulting set as prob03."
+
+- Beginning with... `prob02 |>`
+
+- Remove column... `select(-column_name01)`
+
+`prob03 <- prob02 |>` `select(-column_name01)`
+
+"... **keep** the following **columns**: booking_number, ..."
+
+- Keep columns... `select(column_name01, column_name02)`
+
+"... **select** the following columns organizing them in this order of appearance: (1) end time listener session date..."
+
+- Select columns... `select(column_name01, column_name02)`
+
+`prob03 <- prob02 |>` `select(column_name01, column_name02)`
+
+## Skills-based Computer and Oral Exam #1 Review: Task 4
+
+"Beginning with prob02, filter the rows to keep properties with Inspection Dates in years 2018-2019. Store the resulting set as prob04."
+
+"Beginning with prob03, What is the proportion of bookings of each Race?..."
+
+"Beginning with prob03, summarize the data creating a new column named Country Mean Listen Time which is the mean of Total Minutes of Listen Time for each Country Name value..."
+
+## Skills-based Computer and Oral Exam #1 Review: Task 4 {.scrollable}
+
+"... **filter** the rows to keep properties with Inspection Dates in **years** 2018-2019..."
+
+- Filter dates in years 2018-2019... `filter(Inspection.Date >= '2018-01-01', Inspection.Date < '2020-01-01'))`
+
+- Filter dates in years 2017 and 2019 only... `filter(year(Inspection.Date) %in% c(2017, 2019))`
+
+`prob04 <- prob02 |>` `filter(Inspection.Date >= '2018-01-01', Inspection.Date < '2020-01-01'))`
+
+`prob04 <- prob02 |>` `filter(year(Inspection.Date) %in% c(2017, 2019))`
+
+"... What is the **proportion** of bookings **of each** race?..."
+
+- Of each, For each... `group_by()`
+
+- Proportion... `n() / nrow(data)`
+
+`prob04 <- prob03 |>` `group_by(race) |>` `summarize(race_proportion = n() / nrow(prob03))`
+
+"... **summarize** the data creating a **new column** named country_mean_listen_time which is the **mean** of Total Minutes of Listen Time **for each** Country Name value..."
+
+- Summarize the data creating a new column... `summarize(new_column_name01 = )`
+
+- Mean... `mean()`
+
+`prob04 <- prob03 |>` `group_by(country_name) |>` `` summarize(country_mean_listen_time = mean(`total minutes of listen time`)) ``
+
+## Skills-based Computer and Oral Exam #1 Review: Task 5
+
+"Beginning with prob02, summarize the data creating a new column named Grade.Proportion which is the proportion (0-1) of Grade values. Store the resulting set as prob05."
+
+"Beginning with prob03, filter the rows to keep people with a difference in booking_date and released_date equals 0 days..."
+
+"Beginning with prob03, if a column name contains white space, replace each white space with an underscore..."
+
+## Skills-based Computer and Oral Exam #1 Review: Task 5 {.scrollable}
+
+"**Beginning with** prob02, **summarize** the data creating a **new column** named Grade.Proportion which is the **proportion** (0-1) of Grade values. **Store** the resulting set as prob05."
+
+`prob05 <- prob02 |>` `group_by(Grade) |>` `summarize(Grade.Proportion = n() / nrow(prob02))`
+
+"... **filter** the rows to keep people with a **difference** in booking_date and released_date **equals 0** days..."
+
+- Difference in dates... `booking_date - released_date`
+
+- Equals 0... `== 0`
+
+`prob05 <- prob03 |>` `filter(released_date-booking_date == 0)`
+
+`prob05 <- prob03 |>` `filter(released_date == booking_date)`
+
+"... if a **column name contains** white space or period, **replace each** white space or period with an underscore..."
+
+- Column name... `names(data)` or `colnames(data)`
+
+- Contains (regex syntax)... white space `\\s`, period `\\.`
+
+- "Or" in regex syntax... `|`
+
+- Replace each, replace all... `str_replace_all()`
+
+`names(prob05) <- str_replace_all(names(prob05), '\\s|\\.', '_')`
+
+`prob05 <- prob03 |>` `rename_with(~ str_replace_all(.x, "\\s|\\.", "_"))`
+
+## Transforming Data: Combining {.scrollable}
+
+- When you need to work with multiple datasets of the same subject matter
+
+- Can increase overall amount of information
+
+- Could mean concatenating, binding, or joining
+
+- **Concatenating** is the act of combining objects or strings together
+
+- Typically concatenate with `c()`, `paste()`, or `glue()` (within the **glue** package)
+
+`c(1, 3:5, 'animals')`
+
+`c(iris, 1, 3:5, 'animals')`
+
+`paste(1, 3:5, 'animals')`
+
+`glue::glue('{1} {3:5} animals')`
+
+`data01 |>` `mutate(new_string_column = glue::glue('What a piece of {column_name01}!')`
+
+- **Binding** is the act of combining two or more objects by stacking
+
+- Binding rows makes sense when there are two or more datasets with exact same column information and number of columns
+
+- Binding columns makes sense when there are two or more datasets with exact same rows information and number of rows
+
+  - In the **tidyverse** package, `bind_rows(data01, data02)` stacks objects on top of each other, while `bind_cols(data01, data02)` stacks objects side by side
+
+  - In base R, `rbind(data01, data02)` stacks objects on top of each other, while `cbind(data01, data02)` stacks objects side by side
+
+- Recall mutating a row is the same as a single-row bind with `add_row()` function within the **tidyverse** package
+
+- **Joining** usually implies combining two or more objects with different columns of information into one single object.
+
+- Joining works best when each of the different data objects to have at least one column in common with a unique identifying information, such as an ID variable or geographic location. There are at least 3 situations that can occur when merging objects.
+
+- Joining Scenario 1: observations in the two (or more) separate objects' values do not match each other.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| B        | \$11K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| C        | 2175551234 |
+| E        | 2175551235 |
+| F        | 2175551236 |
+
+| *Joined Data* |            |            |
+|:--------------|:-----------|:-----------|
+| **ID**        | **Salary** | **Number** |
+| A             | \$10K      |            |
+| B             | \$11K      |            |
+| D             | \$12K      |            |
+| C             |            | 2175551234 |
+| E             |            | 2175551235 |
+| F             |            | 2175551236 |
+
+- Joining Scenario 2: observations in the two (or more) separate objects' values do match each other one-to-one.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| B        | \$11K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| A        | 2175551214 |
+| B        | 2175551224 |
+| D        | 2175551244 |
+
+| *Joined Data* |            |            |
+|:--------------|:-----------|:-----------|
+| **ID**        | **Salary** | **Number** |
+| A             | \$10K      | 2175551214 |
+| B             | \$11K      | 2175551224 |
+| D             | \$12K      | 2175551244 |
+
+- Joining Scenario 3: observations in the two (or more) separate objects' values do match each other one-to-many or many-to-one.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| A        | 2175551214 |
+| A        | 2175551204 |
+| D        | 2175551244 |
+
+| *Joined Data* |        |            |
+|:--------------|:-------|:-----------|
+| ID            | Salary | Number     |
+| A             | \$10K  | 2175551214 |
+| A             | \$10K  | 2175551204 |
+| D             | \$12K  | 2175551244 |
+
+- If we intend on keeping rows for which there are only matches between both data1 and data2 then we likely want an inner join: `inner_join(data1, data2, by = column_name)` in **tidyverse** package
+
+- If we intend on keeping rows for which observations in data1 are preserved and keeps matches from data2, then we likely want a left join: `left_join(data1, data2, by = column_name)` in **tidyverse** package
+
+- If we intend on keeping rows for which observations in data1 and data2 are preserved and keeps matches and non-matches from both, then we likely want a full join: `full_join(data1, data2, by = column_name)` in **tidyverse** package
+
+- If the identifying columns' names are not the same, but the information in both are the same, then we can specify the two column names in the `by =` argument: `inner_join(data1, data2, by = join_by(column_name01 == column_name02))` in **tidyverse** package
+
+## Monday In-class Assignment {.scrollable}
+
+1.  Extract the three datasets [Urbana Rentals' Properties provided by City of Urbana](https://uofi.box.com/shared/static/qx1w9safq7luwl4f6ahxbl6agmelr60r.csv), [Urbana Rentals' Inspections provided by City of Urbana](https://uofi.box.com/shared/static/h72vhzjcehkp9wzrizysio6og7iiljad.csv), [Urbana Rentals' Landlords provided by City of Urbana](https://uofi.box.com/shared/static/fvz6ftzfc7hrpt08q8e9ke8fz3lznf25.csv) as separate data frames or tibbles in R.
+
+2.  Join all three datasets together using each of the three joins mentioned above: inner join, left join, and full join. Store each resulting joined set as a different object name.
+
+3.  Ensure your work is reproducible and submit your solutions as a week07_mon.R script file in Canvas for the Week 7 In-class Assignment.
+
+## Review: Relational Database Terminology {.scrollable}
+
+|  |  |
+|:---|:---|
+| **Data** | information |
+| **Database** | a set of related information, such as Contacts, Spotify, iCard, etc.; often written as DB, dB, or db |
+| **Query** | a question, task, or request written to find data |
+| **Entity** | data of specific interest, such as customers, parts, geographic locations, etc. |
+| **Column** | individual piece of data stored in a table |
+| **Row** | set of columns that together completely describe an entity; a record or observation |
+| **Table** | set of rows, held either in memory (nonpersistent) or on permanent storage (persistent) |
+| **Result Set** | the resulting SQL query; a nonpersistent table |
+| **Primary Key** | one or more columns that can be used as a unique identifier for each row in current table; ideally every table has a primary key |
+| **Foreign Key** | one or more columns that can be used together to identify a single row in another table; not a primary key in current table |
+
+<small>Sourced from Chapter 1 of [Learning SQL by Alan Beaulieu](https://learning.oreilly.com/library/view/learning-sql-3rd/9781492057604/)</small>
+
+## Review: Using SQL via R {.scrollable}
+
+| R Function | Description | Code Example |
+|:---|:---|:---|
+| `dbConnect()` | connect to a database | `con <- dbConnect(RMariaDB::MariaDB(), user = "root", password = Sys.getenv("MYSQL_PASSWORD"), host = "localhost", dbname = "sakila")` |
+| `dbListTables()` | list all data tables in a database | `dbListTables(con)` |
+| `dbGetQuery()` | extract from a data table with SQL query | `dbGetQuery(con, "SELECT first_name, last_name FROM actor WHERE last_name LIKE 'B%';")` |
+| `dbDisconnect()` | disconnect from a database; do this when finished working with a DBMS | `dbDisconnect(con)` |
+
+## SQL Query Structure {.scrollable}
+
+`SELECT column_name01, column_name02`\
+`FROM table_name01`\
+`WHERE row_condition01`\
+`GROUP BY column_name01`\
+`HAVING group_condition01`\
+`ORDER BY column_name01`\
+`LIMIT number_of_rows OFFSET number_of_rows_to_skip`
+
+| Clause | Description | Tidyverse Analog |
+|:---|:---|:---|
+| `SELECT` | specifies which columns need to be in the resulting table once the query is complete. Organizes columns, selects all columns with `*`, mutates and renames columns with `AS`, and keeps unique rows with `DISTINCT` | `select()`, `mutate()`, `summarize()`, `distinct()` |
+| `FROM` | the source data; can be used for combining data via joining `INNER JOIN ON`, `LEFT JOIN ON`, `FULL JOIN ON` | `inner_join()`, `left_join()`, `full_join()` |
+| `WHERE` | allows conditions to be placed on rows in the source data | `filter()` |
+| `GROUP BY` | groups data for processing; can be helpful for identifying duplicates | `group_by()` |
+| `HAVING` | allows conditions to be placed in the grouped data. Relevant when a `GROUP BY` clause exists | `group_by() |> filter()` |
+| `ORDER BY` | arranges or sorts the resulting table based on specified column(s) in ascending `ASC` or descending `DESC` order | `arrange()`, `desc()` |
+| `LIMIT number_of_rows OFFSET number_of_rows_to_skip` | limits the number of rows returned in the resulting table with potential to start the limiting at a specific row index | `slice()` |
+
+## SQL Query Order of Evaluation {.scrollable}
+
+- After database connection is established and before the connection is closed, the database server checks the following:
+
+  - Is the user allowed to write a SQL query?\
+  - Is the user allowed to access the data?\
+  - Is the user's query valid?
+
+- If yes to all 3 questions, then the **query optimizer** determines the **execution plan** for the best way to execute the query
+
+- The order of evaluation of typical clauses and components is as follows:
+
+1.  `FROM`
+2.  `WHERE`
+3.  `GROUP BY`
+4.  `HAVING`
+5.  `SELECT`
+6.  `DISTINCT`
+7.  `ORDER BY`
+8.  `LIMIT` and `OFFSET`
+
+## Common SQL Operators and Functions {.scrollable}
+
+- These operators and functions are used in the `SELECT` and `WHERE` clauses of SQL queries.
+
+| SQL Syntax | Operation or Function |
+|:---|:---|
+| \+ | Addition |
+| \- | Subtraction |
+| \* | Multiplication |
+| / | Division |
+| `POWER(base, exponent_number)` | Exponentiation |
+| `MOD(dividend, divisor)` | Modulus |
+| = | Equal to (for comparison) |
+| \<\> | Not Equal to |
+| \> | Greater than |
+| \< | Less than |
+| \>= | Greater than or equal to |
+| \<= | Less than or equal to |
+| `AND` | And |
+| `OR` | Or |
+| `NOT` | Negation |
+| ( ) | Parentheses for grouping conditions |
+| `SQRT()` | Square root |
+| `ABS()` | Absolute value |
+| `LOG()` | Logarithm (natural) |
+| `EXP()` | Exponential function |
+| `ROUND(base, decimal_places)` | Round to nearest decimal place |
+| `AVG()` | Mean |
+| `MIN()` | Minimum |
+| `MAX()` | Maximum |
+| `SUM()` | Sum (aka) total) |
+| `COUNT()` | Count |
+| `RAND()` | Random number generation between 0 and 1 |
+| `IF(condition01, value_true, value_false)` | Two-case transformation |
+| `CASE WHEN condition01 THEN value_case01 WHEN condition02 THEN value_case02 ELSE value_case_03 END` | Multi-case transformation |
+
+## Transforming Data in SQL: Source Data and Combining with `FROM` {.scrollable}
+
+- We can source data from one or more tables in a database with the `FROM` clause
+
+- Tables may be combined through joining using `INNER JOIN ON`, `LEFT JOIN ON`, or `FULL JOIN ON` within the `FROM` clause
+
+- Joining Scenario 1: observations in the two (or more) separate objects' values do not match each other.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| B        | \$11K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| C        | 2175551234 |
+| E        | 2175551235 |
+| F        | 2175551236 |
+
+| *Joined Data* |            |            |
+|:--------------|:-----------|:-----------|
+| **ID**        | **Salary** | **Number** |
+| A             | \$10K      |            |
+| B             | \$11K      |            |
+| D             | \$12K      |            |
+| C             |            | 2175551234 |
+| E             |            | 2175551235 |
+| F             |            | 2175551236 |
+
+- Joining Scenario 2: observations in the two (or more) separate objects' values do match each other one-to-one.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| B        | \$11K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| A        | 2175551214 |
+| B        | 2175551224 |
+| D        | 2175551244 |
+
+| *Joined Data* |            |            |
+|:--------------|:-----------|:-----------|
+| **ID**        | **Salary** | **Number** |
+| A             | \$10K      | 2175551214 |
+| B             | \$11K      | 2175551224 |
+| D             | \$12K      | 2175551244 |
+
+- Joining Scenario 3: observations in the two (or more) separate objects' values do match each other one-to-many or many-to-one.
+
+| *Data 1* |            |
+|:---------|:-----------|
+| **ID**   | **Salary** |
+| A        | \$10K      |
+| D        | \$12K      |
+
+| *Data 2* |            |
+|:---------|:-----------|
+| **ID**   | **Number** |
+| A        | 2175551214 |
+| A        | 2175551204 |
+| D        | 2175551244 |
+
+| *Joined Data* |        |            |
+|:--------------|:-------|:-----------|
+| ID            | Salary | Number     |
+| A             | \$10K  | 2175551214 |
+| A             | \$10K  | 2175551204 |
+| D             | \$12K  | 2175551244 |
+
+- Binding rows makes sense when there are two or more datasets with exact same column information and number of columns. If we intend to stack two or more datasets on top of each other, then we likely want a union, which processes the queries separately first and then stacks.
+
+- `UNION` removes duplicate rows, while `UNION ALL` keeps all rows including duplicates.
+
+`SELECT *`\
+`FROM data01`\
+`UNION`\
+`SELECT *`\
+`FROM data02;`
+
+- If we intend on keeping rows for which there are only matches between both data1 and data2 then we likely want an inner join:
+
+`SELECT *`\
+`FROM data1 INNER JOIN data2 ON data1.column_name = data2.column_name;`
+
+- If we intend on keeping rows for which observations in data1 are preserved and keeps matches from data2, then we likely want a left join:
+
+`SELECT *`\
+`FROM data1 LEFT JOIN data2 ON data1.column_name = data2.column_name;`
+
+- If we intend on keeping rows for which observations in data1 and data2 are preserved and keeps matches and non-matches from both, then we likely want a full join:
+
+`SELECT *`\
+`FROM data1 FULL JOIN data2 ON data1.column_name = data2.column_name;`
+
+## Transforming Data in SQL: Filtering Rows and Dropping Missing Values with `WHERE` {.scrollable}
+
+- Because the `WHERE` clause is evaluated after the `FROM` clause, any actions taken during the `WHERE` cannot be referenced in the previously-evaluated clause
+
+- In SQL, limit row output based on conditions using `WHERE`
+
+- There are helpful operators and functions for filtering rows in SQL, such as `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR`, `NOT`, `LIKE`, `IN`, `BETWEEN`, and `( )` for grouping conditions
+
+`SELECT *`\
+`FROM data_name`\
+`WHERE (column_name01 = condition01) AND (column_name02 <> condition02);`
+
+- For filtering with `LIKE`, the `%` wildcard is used to match any number of characters, while the `_` wildcard is used to match a single character
+
+`SELECT *`\
+`FROM data_name`\
+`WHERE column_name01 LIKE '%';`
+
+- To filter with `IN`, we can specify a list of values to match
+
+`SELECT *`\
+`FROM data_name`\
+`WHERE column_name01 IN (condition_values);`
+
+- In SQL, missing values are coded as `NULL`. Removing them is done with the `IS NULL` or `IS NOT NULL` keywords in the `WHERE` statement.
+
+`SELECT *`\
+`FROM data_name`\
+`WHERE column_name IS NOT NULL;`
+
+## Transforming Data in SQL: Group Processing with `GROUP BY` {.scrollable}
+
+- Because the `GROUP BY` clause is evaluated after the `FROM` and `WHERE` clauses, any actions taken during the `GROUP BY` cannot be referenced in the previously-evaluated clauses
+
+- In SQL, the `GROUP BY` clause allows us to do data processing separately for each specified combination of groups in a table
+
+  - does not explicitly change the table\
+  - evaluated before mutating or summarizing with `SELECT` clause
+
+`SELECT column_name01, column_name02, function_name01(column_name03) AS new_column_name01`\
+`FROM data_name`\
+`GROUP BY column_name01, column_name02;`
+
+## Transforming Data in SQL: Filtering Groups with `HAVING` {.scrollable}
+
+- Because the `HAVING` clause is evaluated after the `FROM`, `WHERE`, and `GROUP BY` clauses, any actions taken during the `HAVING` cannot be referenced in the previously-evaluated clauses
+
+- In SQL, after grouping data with `GROUP BY`, we can limit grouped data output based on conditions using `HAVING`
+
+- There are helpful operators and functions for filtering groups including summary (or aggregate) functions, such as `SUM()`, `COUNT()`, `AVG()`, as well as comparison operators such as `=`, `<>`, `>`, `<`, `>=`, `<=`, `AND`, `OR`, `NOT`
+
+`SELECT *`\
+`FROM data_name`\
+`GROUP BY column_name01`\
+`HAVING summary_function_name01(column_name02) > condition01;`
+
+## Transforming Data in SQL: Organizing, Renaming Columns, Removing Duplicates, and Mutating Columns with `SELECT` {.scrollable}
+
+- Because the `SELECT` clause is evaluated after the `FROM`, `WHERE`, `GROUP BY`, and `HAVING` clauses, any actions taken during the `SELECT` cannot be referenced in the previously-evaluated clauses
+
+- In SQL, we may select columns by writing their name after the `SELECT` clause
+
+`SELECT column_name01, column_name02, column_name03`\
+`FROM data_name;`
+
+- We can select all columns with `SELECT *`
+
+`SELECT *`\
+`FROM data_name;`
+
+- We can rename columns with `AS` in the `SELECT` clause
+  - This does not change the column name in the source data, but only in the resulting table
+  - Below, `new_column_name01` and `new_column_name02` cannot be used or referenced in the `WHERE`, `GROUP BY`, or `HAVING` clauses because the column names are evaluated after those clauses
+
+`SELECT column_name01 AS new_column_name01, column_name02 AS new_column_name02`\
+`FROM data_name;`
+
+- If we want to remove duplicate rows, then we can use the `DISTINCT` keyword in the `SELECT` clause
+  - This does take up computational resources
+
+`SELECT DISTINCT column_name01, column_name02`\
+`FROM data_name;`
+
+- We **mutate** new columns in the `SELECT` clause as long as the new columns are created with vectorized operations and functions. If the new column is created with a summary or aggregate operation or function, then we **summarized** the data, not mutated.
+
+- Many vectorized functions and operators exist in SQL
+
+  - arithmetic operators: `+`, `-`, `*`, `/`, `MOD()`, `POWER()`\
+  - logical operators: `>`, `<`, `>=`, `<=`, `=`, and `<>`\
+  - mathematics functions: `EXP()`, `LOG()`, `SQRT()`, `ABS()`, `RAND()`, and `ROUND()`\
+  - string manipulation functions: `CONCAT()`, `SUBSTRING()`, `UPPER()`, and `LOWER()`\
+  - conditional functions: `IF()`, and `CASE WHEN THEN ELSE END`
+
+- Several summary or aggregate functions exist in SQL, such as `SUM()`, `COUNT()`, `AVG()`, `MIN()`, and `MAX()`
+
+- Multiplying by `1.0` is a common trick to convert integers to decimals in SQL
+
+`SELECT function_name01(column_name01) AS new_column_name01, function_name02(column_name02) AS new_column_name02`\
+`FROM data_name;`
+
+`SELECT column_name01, IF(column_name02 = original_value01, new_value01_if_true, new_value02_if_false) AS new_column_name01`\
+`FROM data_name;`
+
+`SELECT column_name01, CASE WHEN column_name02 = original_value01 THEN new_value01 WHEN column_name02 = original_value02 THEN new_value02 ELSE new_value03 END AS new_column_name01`\
+`FROM data_name;`
+
+- We can mutate literal values in the `SELECT` clause, such as numbers, strings, and dates
+
+`SELECT column_name01, 'literal_string' AS new_column_name01, 1 AS new_column_name02, '2024-06-01' AS new_column_name03`\
+`FROM data_name;`
+
+## Transforming Data in SQL: Arranging or Sorting {.scrollable}
+
+- In SQL, we can arrange or sort the resulting table based on specified column(s) in ascending or descending order with `ORDER BY` clause
+  - The default ordering is ascending. If we want descending order, then we use the `DESC` keyword after the field name.
+
+`SELECT *` `FROM data_name`\
+`ORDER BY column_name01 ASC, column_name02 DESC;`
+
+## Transforming Data in SQL: Slicing {.scrollable}
+
+- In SQL, limit row output based on row index or position using `LIMIT` and its relative `OFFSET`
+
+`SELECT *`\
+`FROM data_name`\
+`LIMIT number_of_rows OFFSET number_of_rows_to_skip;`
+
+- If wanting to mimic the **tidyverse** package's `slice_sample()` function, then we can use `ORDER BY RAND()` to randomize the row order and then limit the number of rows returned with `LIMIT`
+  - If the data has many rows, then `RAND()` may take a while to process
+
+`SELECT *`\
+`FROM data_name`\
+`ORDER BY RAND()`\
+`LIMIT number_of_rows;`
+
+## Wednesday In-class Assignment {.scrollable}
+
+1.  Extract the [Champaign County Sheriff Office Jail Data provided by Champaign County Sheriff Office Jail Data and State of Illinois](https://uofi.box.com/shared/static/mz7cefd4z0agdnhamvayq48ehlb0c3r6.dsv) as a data frame or tibble in R. Using tidyverse methods, overwrite the booking_date and released_date columns to be proper date modes in R and store the resulting set as jail_data. A brief data description is below and may be helpful for understanding the data.
+
+"The Champaign County Sheriff Office Jail Data contains 11082 observations and 40 columns for individuals who were booked into jail in Champaign County Jail in year 2019. The rows are considered bookings. Each person is uniquely identifiable by their jacket number. Each booking is uniquely identifiable by its booking number. Some rows in the data appear more than once because of multiple crimes being assigned to one booking. There is also the possibility that some people are recidivists meaning they are booked into jail at more than one date-time. The demographics of the people, reasons for being booked, and crime code are also given in the data. The original source is the Champaign County Sheriff Office & Jail (CCSO)."
+
+2.  Using SQL via R, run the following line of code to load the data into the sakila database. The object `con` is the connection you made to the sakila database in problem 2 (above).
+
+```         
+ dbWriteTable(con, "ccso_jail", jail_data)
+```
+
+3.  Beginning with ccso_jail and using SQL via R, write a query that returns the people who were booked for more than one crime.
+
+4.  Beginning with ccso_jail and using SQL via R, write a query that contains data that answers the question: 'Which people were booked into jail at two or more time points?'
+
+5.  Ensure your work is reproducible and submit your solutions as a week05_wed.R script file in Canvas for the Week 5 In-class Assignment.

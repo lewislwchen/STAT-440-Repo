@@ -1,0 +1,441 @@
+---
+title: "STAT 440: Week 9"
+subtitle: "Skills-based Computer and Oral Exam #2 Practice"
+author: Christopher Kinson
+format: revealjs
+editor: visual
+---
+
+## Monday: Problem 1 (2 minutes)
+
+Extract the Champaign County Sheriff Office Jail Data <https://uofi.box.com/shared/static/mz7cefd4z0agdnhamvayq48ehlb0c3r6.dsv> as a data frame or tibble in R. Using tidyverse methods or base R methods:
+
+- overwrite the booking_date and released_date columns to be proper date modes in R
+
+- overwrite the jacket_number and booking_number columns to be character modes in R
+
+- rename all columns to be lower case
+
+- store the resulting set as jail_data
+
+## Monday: Problem 2 (1 minute)
+
+Using SQL via R, run the following lines of code to connect to sakila database and load the jail_data in. The object `con` is the connection you made to the sakila database. You may need to supply your computer's MySQL password.
+
+```         
+library(DBI)
+
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+
+dbWriteTable(con, "ccso_jail", jail_data, overwrite = TRUE)
+```
+
+## Monday: Problem 3 (2 minutes)
+
+Using ccso_jail and SQL via R, remove any NA or NULL values of released_date. Now, create a query that mutates the data with two new columns named "booking_date_time" and "released_date_time". Booking_date_time is the concatenation of the booking_date and booking_time columns. Released_date_time is the concatenation of the released_date and released_time columns. These new columns must be proper DATETIME types.
+
+## Monday: Problem 4 (3 minutes)
+
+Using ccso_jail and SQL via R, create a query that returns a summarized result set with the following objectives:
+
+- one row for each jacket_number
+
+- new column named "crimes_list" containing crime values that are collapsed or concatenated such that all distinct crimes for each jacket_number are separated by a comma
+
+- new column named "n_crimes" containing the total number of distinct crimes for each jacket_number
+
+- 3 columns (named as such and appearing from left to right): jacket_number, crimes_list, n_crimes
+
+## Monday: Problem 5 (2 minutes)
+
+- Explain any error(s) in the following code and write corrected code below. Your explanation should be written as an R comment such as `# the error...`
+
+```         
+dbGetQuery(con, '
+SELECT arrest_agency, COUNT(arrest_agency) OVER() AS n_of_each_arrest_agency, COUNT(arrest_agency)/SUM(COUNT(arrest_agency)) OVER() AS percent
+FROM (SELECT *, CONCAT(first_name, " " , last_name) AS full_name 
+      FROM ccso_jail  
+      WHERE arrest_agency IS NOT NULL) 
+GROUP BY arrest_agency
+ORDERBYpercent
+;')
+```
+
+- Ensure your work is reproducible, comment out error-producing code, and submit your solutions as a week09_mon.R script file in Canvas.
+
+## Monday: Solution 1 {.scrollable}
+
+```         
+library(tidyverse)
+
+jail_data <- read_delim('https://uofi.box.com/shared/static/mz7cefd4z0agdnhamvayq48ehlb0c3r6.dsv', delim = '&') |>
+  rename_with(~ tolower(.x)) |>
+  mutate(booking_date = mdy(booking_date), 
+         released_date = mdy(released_date)) |>
+  mutate(booking_number = as.character(booking_number), 
+         jacket_number = as.character(jacket_number))
+
+names(jail_data) # viewing column names
+str(jail_data) # viewing overall structure and dimensions
+```
+
+## Monday: Solution 2
+
+```         
+library(DBI)
+
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+
+dbWriteTable(con, "ccso_jail", jail_data, overwrite = TRUE)
+```
+
+## Monday: Solution 3
+
+```         
+dbGetQuery(con, '
+SELECT *, CAST(CONCAT(booking_date, " ", booking_time) AS DATETIME) AS booking_date_time, CAST(CONCAT(released_date, " ", released_time) AS DATETIME) AS released_date_time
+FROM ccso_jail
+WHERE released_date IS NOT NULL
+;')
+```
+
+## Monday: Solution 4
+
+```         
+dbGetQuery(con, '
+SELECT jacket_number, GROUP_CONCAT(DISTINCT crime) AS crimes_list, COUNT(DISTINCT crime) AS n_crimes
+FROM ccso_jail
+GROUP BY jacket_number
+;')
+```
+
+## Monday: Solution 5 {.scrollable}
+
+```         
+# incorrect code
+dbGetQuery(con, '
+SELECT arrest_agency, COUNT(arrest_agency) OVER() AS n_of_each_arrest_agency, COUNT(arrest_agency)/SUM(COUNT(arrest_agency)) OVER() AS percent
+FROM (SELECT *, CONCAT(first_name, " " , last_name) AS full_name 
+      FROM ccso_jail  
+      WHERE arrest_agency IS NOT NULL) 
+GROUP BY arrest_agency
+ORDERBYpercent
+;')
+```
+
+```         
+# errors are: n_of_each_arrest_agency is not computed properly, subquery needs alias in FROM clause, percent computation needs to be multiplied by 100.0.
+```
+
+```         
+# corrected code
+dbGetQuery(con, '
+SELECT arrest_agency, COUNT(arrest_agency) AS n_of_each_arrest_agency, 100.0*COUNT(arrest_agency)/SUM(COUNT(arrest_agency)) OVER() AS percent
+FROM (SELECT *, CONCAT(first_name, " " , last_name) AS full_name 
+      FROM ccso_jail  
+      WHERE arrest_agency IS NOT NULL) AS d1
+GROUP BY arrest_agency
+ORDER BY percent DESC
+;')
+```
+
+## Wednesday: Problem 1 (2 minutes)
+
+Extract the Food Inspections Data in year 2019 provided by City of Chicago <https://uofi.box.com/shared/static/ht0m74fktmplay8j3lpu18zcpfpmsra8.csv> as a data frame or tibble in R. Using tidyverse methods or base R methods:
+
+- rename all columns to be lower case
+
+- replace any white spaces or periods in the column names with underscores
+
+- overwrite the inspection_date column to be a proper date mode in R
+
+- store the resulting set as food_inspections_data
+
+## Wednesday: Problem 2 (1 minute)
+
+Using SQL via R, run the following lines of code to connect to sakila database and load the food_inspections_data in. The object `con` is the connection you made to the sakila database. You may need to supply your computer's MySQL password.
+
+```         
+library(DBI)
+
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+
+dbWriteTable(con, "food_inspections", food_inspections_data, overwrite = TRUE)
+```
+
+## Wednesday: Problem 3 (2 minutes)
+
+Using food_inspections and SQL via R, create a query that contains the data answering the question: Among establishments with facility_type containing the string "school", which of their inspection results equal "Fail"?
+
+In other words, which schools have ever failed their inspection?
+
+## Wednesday: Problem 4 (3 minutes)
+
+Using food_inspections and SQL via R create a:
+
+- subquery in the WHERE clause containing the rows of dba_name values having greater than 1 distinct address value
+
+- outer query summarizes the average number of total violations for each dba_name
+
+- 2 columns (named as such and appearing from left to right): dba_name, average_total_violations_each_dba_name
+
+## Wednesday: Problem 5 (2 minutes)
+
+- Explain any error(s) in the following code (using food_inspections and SQL via R) and write corrected code below. Your explanation should be written as an R comment such as `# the error...`
+
+```         
+dbGetQuery(con, '
+SELECT address, COUNT(dba_name DISTINCT) AS n_businesses, 
+  CASE WHEN HAVING COUNT(DISTINCT dba_name) > 1 THEN 1
+  ELSE 0 END AS business_plaza
+FROM food_inspections
+GROUP BY addressees 
+;')
+```
+
+- Ensure your work is reproducible, comment out error-producing code, and submit your solutions as a week09_wed.R script file in Canvas.
+
+## Wednesday: Solution 1
+
+```         
+library(tidyverse)
+
+food_inspections_data <- read_csv('https://uofi.box.com/shared/static/ht0m74fktmplay8j3lpu18zcpfpmsra8.csv') |>
+  rename_with(~ tolower(.x)) |>
+  rename_with(~ str_replace_all(.x, "\\s|\\.", "_")) |>
+  mutate(inspection_date = mdy(inspection_date))
+
+names(food_inspections_data) # viewing column names
+str(food_inspections_data) # viewing overall structure and dimensions
+```
+
+## Wednesday: Solution 2
+
+```         
+library(DBI)
+
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+
+dbWriteTable(con, "food_inspections", food_inspections_data, overwrite = TRUE)
+```
+
+## Wednesday: Solution 3
+
+```         
+dbGetQuery(con, '
+SELECT dba_name, results
+FROM food_inspections
+WHERE UPPER(results) = "FAIL" AND (UPPER(facility_type) LIKE "SCHOOL%" OR facility_type LIKE "%SCHOOL")
+;')
+```
+
+## Wednesday: Solution 4
+
+```         
+dbGetQuery(con, '
+SELECT dba_name, AVG(total_violations) AS average_total_violations_each_dba_name
+FROM food_inspections
+WHERE dba_name IN (SELECT dba_name
+  FROM food_inspections
+  GROUP BY dba_name
+  HAVING COUNT(DISTINCT address) > 1)
+GROUP BY dba_name
+;')
+
+dbGetQuery(con, 'SELECT dba_name, total_violations FROM food_inspections WHERE dba_name LIKE "CHEESIE%S PUB & GRUB"')
+```
+
+## Wednesday: Solution 5 {.scrollable}
+
+```         
+# incorrect code
+dbGetQuery(con, '
+SELECT address, COUNT(dba_name DISTINCT) AS n_businesses, 
+  CASE WHEN HAVING COUNT(DISTINCT dba_name) > 1 THEN 1
+  ELSE 0 END AS business_plaza
+FROM food_inspections
+GROUP BY addressees 
+;')
+```
+
+```         
+# errors are: n_businesses is not computed properly, syntax of case when is incorrect, column name is address not addressees.
+```
+
+```         
+# corrected code
+dbGetQuery(con, '
+SELECT address, COUNT(DISTINCT dba_name) AS n_businesses, 
+  CASE WHEN COUNT(DISTINCT dba_name) > 1 THEN 1
+  ELSE 0 END AS business_plaza
+FROM food_inspections
+GROUP BY address ;')
+```
+
+## Friday: Problem 1 (2 minutes)
+
+Extract the 2019 Popular Baby Names of Illinois Data provided by Social Security Administration <https://uofi.box.com/shared/static/a1u1xw2nsivngvdy1r9rve7dztm9ktmu.csv> as a data frame or tibble in R. Using tidyverse methods or base R methods:
+
+- for the name column, overwrite the all values in it to be all upper case letters
+
+- store the resulting set as illinois_baby_names_data
+
+## Friday: Problem 2 (1 minute)
+
+Using SQL via R, run the following lines of code to connect to sakila database and load the data in. The object `con` is the connection you made to the sakila database. You may need to supply your computer's MySQL password.
+
+```         
+library(DBI)
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+dbWriteTable(con, "illinois_baby_names", illinois_baby_names_data, overwrite = TRUE)
+```
+
+## Friday: Problem 3 (3 minutes)
+
+Using illinois_baby_names and SQL via R, create a query resulting in data that answers the question: Which names are three-letter palindromes?
+
+A **palindrome** is a word that is the same spelled from left to right and right to left. BOB is a palindrome.
+
+## Friday: Problem 4 (3 minutes)
+
+Using illinois_baby_names and SQL via R, create a query resulting in data that answers the question: Which names are gender neutral?
+
+A **gender neutral name** is a name that exists for both male and female bodies.
+
+## Friday: Problem 5 (2 minutes)
+
+- Execute the following code.
+
+- Now, write R code using tidyverse functionality to achieve the same result set.
+
+```         
+dbGetQuery(con, '
+SELECT name, SUM(frequency) AS total_frequency, RANK() OVER(ORDER BY SUM(frequency) DESC) AS ranking
+FROM illinois_baby_names
+WHERE name IN (SELECT DISTINCT name FROM illinois_baby_names) 
+GROUP BY name
+LIMIT 20
+;')
+```
+
+- Ensure your work is reproducible, comment out error-producing code, and submit your solutions as a week09_fri.R script file in Canvas.
+
+## Friday: Solution 1 {.scrollable}
+
+```         
+library(tidyverse)
+
+illinois_baby_names_data <- read_csv('https://uofi.box.com/shared/static/a1u1xw2nsivngvdy1r9rve7dztm9ktmu.csv') |>
+  mutate(name = toupper(name))
+
+names(illinois_baby_names_data) # viewing column names
+str(illinois_baby_names_data) # viewing overall structure and dimensions
+```
+
+## Friday: Solution 2
+
+```         
+library(DBI)
+con <- dbConnect(
+  drv = RMariaDB::MariaDB(),
+  user = "root", 
+  password = Sys.getenv("MYSQL_PASSWORD"), 
+  host = "localhost", 
+  dbname = "sakila")
+dbWriteTable(con, "illinois_baby_names", illinois_baby_names_data, overwrite = TRUE)
+```
+
+## Friday: Solution 3
+
+```         
+dbGetQuery(con, '
+SELECT *
+FROM illinois_baby_names
+WHERE name LIKE "A_A" OR name LIKE "M_M" OR
+name LIKE "B_B" OR name LIKE "N_N" OR
+name LIKE "C_C" OR name LIKE "O_O" OR
+name LIKE "D_D" OR name LIKE "P_P" OR
+name LIKE "E_E" OR name LIKE "Q_Q" OR
+name LIKE "F_F" OR name LIKE "R_R" OR
+name LIKE "G_G" OR name LIKE "S_S" OR
+name LIKE "H_H" OR name LIKE "T_T" OR
+name LIKE "I_I" OR name LIKE "U_U" OR
+name LIKE "J_J" OR name LIKE "V_V" OR
+name LIKE "K_K" OR name LIKE "W_W" OR
+name LIKE "L_L" OR name LIKE "X_X" OR
+name LIKE "Y_Y" OR name LIKE "Z_Z"
+;')
+```
+
+## Friday: Solution 4
+
+```         
+dbGetQuery(con, '
+SELECT *
+FROM illinois_baby_names 
+WHERE name IN (SELECT name
+FROM illinois_baby_names
+GROUP BY name
+HAVING COUNT(name) >1
+ORDER BY name)
+ORDER BY name, sex
+;')
+```
+
+## Friday: Solution 5 {.scrollable}
+
+```         
+dbGetQuery(con, '
+SELECT name, SUM(frequency) AS total_frequency, RANK() OVER(ORDER BY SUM(frequency) DESC) AS ranking
+FROM illinois_baby_names
+WHERE name IN (SELECT DISTINCT name FROM illinois_baby_names) 
+GROUP BY name
+LIMIT 20
+;')
+```
+
+```         
+# tidyverse code
+illinois_baby_names_data |>
+group_by(name) |>
+summarize(total_frequency = sum(frequency)) |>
+arrange(desc(total_frequency)) |>
+ungroup() |>
+mutate(ranking = rank(desc(total_frequency), ties.method = "min")) |>
+slice(1:20)
+```
+
+## Friday: SQL Topics to Review
+
+- Filtering with strings
+
+- Filtering with dates
+
+- Windowing with analytic functions (overall average, total, etc.) over groups and dates
+
+- Subqueries

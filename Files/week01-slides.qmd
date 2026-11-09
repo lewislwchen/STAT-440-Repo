@@ -1,0 +1,252 @@
+---
+title: "STAT 440: Week 1"
+author: Christopher Kinson
+format: revealjs
+editor: visual
+---
+
+## Monday: Highlights
+
+The syllabus has important course information.
+
+- [Office Hours](https://chriskinson.com/stat440fa26#officehours)
+
+- [Calendar](https://chriskinson.com/stat440fa26#calendar)
+
+- [Software](https://chriskinson.com/stat440fa26#software)
+
+  - 
+
+    ### Stay up-to-date!
+
+- [Assignments](https://chriskinson.com/stat440fa26#assignments)
+
+- [Academic Integrity and AI Tools Policy](https://chriskinson.com/stat440fa26#academicintegrity)
+
+## Wednesday: Highlights
+
+- AI integration within RStudio via Posit
+
+  - 30-day free trial; \$20/month afterwards
+
+- AI integration within RStudio via GitHub Copilot
+
+  - free with verified student GitHub account
+
+- File name conventions
+
+  - `snake_case` for coding
+  - kebab-case for local computer files
+
+## Wednesday: Highlights
+
+- File paths: local (irreproducible) vs URL (reproducible)
+
+### Irreproducible: "C:/Users/.../data.csv"
+
+### Preferred: "https://uofi.box.com/shared/static/data.csv"
+
+- File extensions can be helpful but are not necessarily aligned
+
+- Open the file and check the structure for yourself
+
+## Wednesday: Highlights
+
+- Structured data
+
+  - Rectangular
+  - Rows and columns
+  - Delimiter such as `, |&.;`
+
+## Wednesday: Highlights
+
+- Delimiter is comma
+
+```{r echo=TRUE}
+# comma delimited
+readr::read_csv("https://uofi.box.com/shared/static/sctl0dsd72wubxfrn7ko0v6namn9fhl4.csv") |>
+  head(3) |>
+  print(width = Inf)
+```
+
+## Wednesday: Highlights
+
+- Delimiter is tab
+
+```{r echo=TRUE}
+# tab delimited. specify the delimiter via delim =
+readr::read_delim("https://uofi.box.com/shared/static/5nqg2dk8uym5u87s9rv1gq10mtxnybij.txt", delim = "\t") |>
+  head(3) |>
+  print(width = Inf)
+```
+
+## Wednesday: Highlights
+
+- Semi-structured data
+
+  - Human-readable text with keystroke separators such as `[] : , ""`\
+  - JSON, geoJSON, html, xml
+
+```{r echo=TRUE}
+music_data <- jsonlite::fromJSON("https://uofi.box.com/shared/static/omj8z0gb2zivcuhn5fhqt0n8ahvxwes4.json")
+
+head(music_data$billboard_artist)
+```
+
+## Wednesday: Highlights
+
+- Semi-structured data can be deeply nested
+
+```{r echo=TRUE}
+unlist(music_data$spotify_data[[1]][[1]][[1]]$name)
+```
+
+## Wednesday: Highlights
+
+- Unstructured data
+
+  - Audio
+  - Video
+  - Book
+
+![](https://uofi.box.com/shared/static/s6t2obub53vwd2oadwjffok4acbzk6sd.png)
+
+## Friday: Messy Data Defined
+
+- Reasonably large
+
+- Errors present and frequent
+
+- Inconsistent values
+
+- Improperly formatted column(s)
+
+- Difficult to parse character-valued column(s); not categorical
+
+## Friday: Clean Data Defined
+
+- No errors
+
+- Consistent
+
+- Properly formatted column(s)
+
+- Easily parsed character-valued column(s)
+
+- Ready for analysis
+
+### What we do in this class is transform messy data into clean data.
+
+## Friday: Base R Reminders
+
+- R's strength is **vectorization**.
+
+- Data frames are lists. Lists are not data frames.
+
+- `$` when data frame has names. `[[]]` otherwise.
+
+- `lapply()` for vectorizing on lists.
+
+  - 
+
+    ### Data frames are lists.
+
+## Friday: Useful Base R Operators and Functions
+
+|          |        |           |
+|:---------|:-------|:----------|
+| length() | mode() | typeof()  |
+| class()  | str()  | summary() |
+| \+       | \-     | \*        |
+| /        | \^     | %%        |
+| sqrt()   | abs()  | round()   |
+| var()    | sd()   | cumsum()  |
+| \>       | \<     | ==        |
+| !=       | \<=    | \>=       |
+
+## Friday: Useful Base R Operators and Functions
+
+|          |         |              |
+|:---------|:--------|:-------------|
+| sum()    | mean()  | median()     |
+| table()  | max()   | min()        |
+| range()  | nrow()  | ncol()       |
+| dim()    | names() | attributes() |
+| seq()    | rep()   | sample()     |
+| sort()   | order() | rev()        |
+| unique() | which() | %in%         |
+| ifelse() | any()   | all()        |
+
+## Friday: Useful Base R Operators and Functions
+
+|             |                |                 |
+|:------------|:---------------|:----------------|
+| c()         | cbind()        | rbind()         |
+| function()  | head()         | tail()          |
+| paste()     | nchar()        | grepl()         |
+| substring() | gsub()         | strsplit()      |
+| exists()    | is.character() | is.data.frame() |
+
+## Friday: Using Google Drive as Cloud Storage for Loading Data
+
+- Share as "Anyone with the link"
+
+```         
+https://drive.google.com/file/d/1Ex8g9--iHoh8A_rPLUcqpUslDVXCWpUW/view?usp=sharing
+```
+
+- Locate file ID which is between `/d/` and `/view?usp=sharing` in the URL
+
+```         
+1Ex8g9--iHoh8A_rPLUcqpUslDVXCWpUW
+```
+
+- Change the URL replacing `/file/d/` with `/uc?export=download&id=` and removing `/view?usp=sharing`
+
+```         
+https://drive.google.com/uc?export=download&id=1Ex8g9--iHoh8A_rPLUcqpUslDVXCWpUW
+```
+
+## Friday: Using Box as Cloud Storage is Preferred
+
+- Students have access to [Box](https://box.illinois.edu/) via the University of Illinois.
+
+- If you've never setup your UofI Box account, start with your [Cloud Dashboard](https://cloud-dashboard.illinois.edu/)
+
+## Friday: In-class Assignment
+
+A series of timed data science tasks to check your base R knowledge and skills.
+
+*See next slide for 7 problems.*
+
+## Friday: In-class Assignment {.scrollable}
+
+1. Find a JSON data file online and load it into R using either the local download or the URL. (5 minutes)
+
+2. Print the column names of the data frame. (2 minutes)
+
+3. Print the first 10 rows of the data frame such that all columns are visible. (2 minutes)
+
+4. Print the mode, i.e. `mode()`, of each column of the data frame. (1 minute)
+
+5. Print the typeof, i.e. `typeof()`, or class, i.e. `class()`, of each column of the data frame. (1 minute)
+
+6. Pick one column that is character-valued and truncate the character strings to retain only the first 2 characters. (3 minutes)
+
+7. Create a new numeric column representing the number of characters (character length) of one character-valued column. (3 minutes)
+
+## Resources for Learning R Fundamentals Quickly {.scrollable}
+
+Free textbooks:
+
+- [R Coding Basics by Gaston Sanchez](https://www.gastonsanchez.com/R-coding-basics/)
+
+- [The Art of R Programming by Norman Matloff](https://www.oreilly.com/library/view/the-art-of/9781593273842/)
+
+Free video:
+
+- <https://youtu.be/edCO5cNbA7I?si=aCyI8jXUIzx4i8W6> (I have not watched this video.)
+
+Interactive learning:
+
+- <https://swirlstats.com/> (I have not used this resource.)
